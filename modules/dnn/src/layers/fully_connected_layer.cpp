@@ -100,7 +100,14 @@ namespace dnn
             Mat dstMat(M, N, output[i].type(), output[i].ptrf());
 
             //important: Caffe stores weights as transposed array
-            cv::gemm(srcMat, weight, 1, noArray(), 0, dstMat, GEMM_2_T);
+#ifdef USE_MKL_GEMM
+			int lda = K;
+			int ldb = K;
+			int ldc = N;
+			cblas_sgemm(CblasRowMajor,CblasNoTrans,CblasTrans,M,N,K,1.0,(float*)srcMat.data,lda,(float*)weight.data,ldb,0.0,(float*)dstMat.data,ldc);
+#else
+			cv::gemm(srcMat, weight, 1, noArray(), 0, dstMat, GEMM_2_T);
+#endif
 
             if (bias)
             {

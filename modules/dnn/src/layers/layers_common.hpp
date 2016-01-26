@@ -42,6 +42,10 @@
 #ifndef __OPENCV_DNN_LAYERS_LAYERS_COMMON_HPP__
 #define __OPENCV_DNN_LAYERS_LAYERS_COMMON_HPP__
 #include <opencv2/dnn.hpp>
+#define USE_MKL_GEMM
+#ifdef USE_MKL_GEMM
+#include <mkl_cblas.h>
+#endif
 
 namespace cv
 {

@@ -129,8 +129,17 @@ namespace dnn
 
                     Mat kerMat(outGroupCn, ksize, wgtBlob.type(), wgtBlob.ptr(g*outGroupCn));
                     Mat dstMat(outGroupCn, outH*outW, outBlob.type(), outBlob.ptr(n, g*outGroupCn));
-
+#if defined(USE_MKL_GEMM)
+					int kk = ksize;
+					int mm = outGroupCn;
+					int nn = outH*outW;
+					int lda = kk;
+					int ldb = nn;
+					int ldc = nn;
+					cblas_sgemm(CblasRowMajor,CblasNoTrans,CblasNoTrans,mm,nn,kk,1.0,(float*)kerMat.data,lda,(float*)colMat.data,ldb,0.0,(float*)dstMat.data,ldc);
+#else
                     cv::gemm(kerMat, colMat, 1, noArray(), 0, dstMat);
+#endif
 
                     if (bias)
                     {
